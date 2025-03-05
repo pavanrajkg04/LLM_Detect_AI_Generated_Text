@@ -81,13 +81,14 @@ def feature_extraction(tab, batch_size, llm_model, llm_tokenizer, max_length):
             truncation=True,
             max_length=max_length
         )
+        # Move tensors to the correct device
         tokens = {k: v.to(device) for k, v in tokens.items()}
         
         # Forward pass through the model
         logits = llm_model(**tokens).logits
         
         # Compute entropy
-        vetD, vetL = Entropy.compute_entropy(tokens.input_ids, logits, tokens.attention_mask)
+        vetD, vetL = Entropy.compute_entropy(tokens['input_ids'], logits, tokens['attention_mask'])
         
         # Compute features
         tab.loc[index_list, 'meanchr'] = tab.loc[index_list, 'len_chr'].values / np.sum(np.isfinite(vetL), axis=-1)
